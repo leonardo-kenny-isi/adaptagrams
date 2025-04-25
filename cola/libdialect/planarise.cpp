@@ -132,6 +132,7 @@ void OrthoPlanariser::removeEdgeOverlaps(void) {
     // The GhostNodes will be set to masquerade as the original Nodes, i.e. to report
     // the original Nodes' IDs. This helps us to later create the Edges for the new Graph.
     m_overlapFreeGraph = std::make_shared<Graph>();
+    m_overlapFreeGraph->getParameters(*m_givenGraph);
     for (auto pair : m_givenGraph->getNodeLookup()) {
         Node_SP &u = pair.second;
         GhostNode_SP g = GhostNode::allocate(*u);
@@ -299,7 +300,7 @@ Nodes OrthoPlanariser::computeCrossings(void) {
     Nodes crossingNodes;
     // For display/testing purposes, we want the crossing nodes we create to
     // look smaller than the average node in the graph.
-    double crossingNodeSize = m_givenGraph->getIEL()/8.0;
+    double crossingNodeSize = m_givenGraph->getIEL()*m_givenGraph->getCrossThickness();
     // Build all Events for all segments.
     Events evts;
     for (EdgeSegment *seg : m_edgeSegments) {
@@ -309,7 +310,7 @@ Nodes OrthoPlanariser::computeCrossings(void) {
     }
     // Partition by x-coord.
     // Experimentally determined partition tolerance:
-    const double tol = 0.8;
+    const double tol = m_givenGraph->getPartitionSize();
     vector<Events> xparts = partition<Event*>(evts, [](Event *e)->double{return e->x();}, tol);
     // Set of Events representing open horizontal segments:
     std::set<Event*> openH;
@@ -397,6 +398,7 @@ Nodes OrthoPlanariser::computeCrossings(void) {
 
 void OrthoPlanariser::removeEdgeCrossings(void) {
     m_planarGraph = std::make_shared<Graph>();
+    m_planarGraph->getParameters(*m_givenGraph);
     // Start the new graph with a ghost of each node in the overlap-free graph.
     for (auto pair : m_overlapFreeGraph->getNodeLookup()) {
         Node_SP &u = pair.second;

@@ -159,7 +159,7 @@ struct HolaOpts {
     //! Padding to be added to nodes during layout, in order to maintain gaps between them:
     //! Again, this is a scalar multiplier of the IEL.
     double nodePaddingScalar = 0.25;
-
+    double extraBoundaryGap = 0.5;
 
     //! Finishing
 

@@ -121,6 +121,10 @@ Graph::Graph(const Graph &G)
       m_projectionDebugLevel(G.m_projectionDebugLevel),
       m_sepMatrix(G.m_sepMatrix),
       m_iel(G.m_iel),
+      m_infer_iel_mult(G.m_infer_iel_mult),
+      m_edge_thickness(G.m_edge_thickness),
+      m_cross_thickness(G.m_cross_thickness),
+      m_partition_size(G.m_partition_size),
       m_needNewRectangles(true),
       m_nodes(G.m_nodes),
       m_edges(G.m_edges),
@@ -143,6 +147,13 @@ Graph &Graph::operator=(Graph other) {
     // Thanks to https://stackoverflow.com/a/3279550
     swap(*this, other);
     return *this;
+}
+
+void Graph::getParameters(Graph &G){
+    setMultInferIEL(G.getMultInferIEL());
+    setEdgeThickness(G.getEdgeThickness());
+    setPartitionSize(G.getPartitionSize());
+    setCrossThickness(G.getCrossThickness());
 }
 
 unsigned Graph::getMaxDegree(void) const {
@@ -604,7 +615,7 @@ void Graph::recomputeMaxDegree(void) {
 }
 
 double Graph::autoInferIEL(void) {
-    m_iel = 2*computeAvgNodeDim();
+    m_iel = m_infer_iel_mult*computeAvgNodeDim();
     return m_iel;
 }
 

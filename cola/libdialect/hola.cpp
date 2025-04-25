@@ -145,7 +145,7 @@ void dialect::doHOLA(Graph &G, const HolaOpts &holaOpts, Logger *logger) {
     log(*core, string_format("%02d_core_ortho_hub", ln++));
 
     // Set extra gap for boundary constraints.
-    core->getSepMatrix().setExtraBdryGap(IEL/2.0);
+    core->getSepMatrix().setExtraBdryGap(IEL*holaOpts.extraBoundaryGap);
 
     // Dissipate any stress accumulated during ortho hub layout, aiming to regain a natrual
     // distribution for the nodes that remain unconstrained, and perhaps regain natural symmetries.
@@ -222,7 +222,7 @@ void dialect::doHOLA(Graph &G, const HolaOpts &holaOpts, Logger *logger) {
     log(*P, string_format("%02d_planar_graph_P", ln++));
 
     // Set extra gap for boundary constraints.
-    P->getSepMatrix().setExtraBdryGap(IEL/2.0);
+    P->getSepMatrix().setExtraBdryGap(IEL*holaOpts.extraBoundaryGap);
     // Destress the new planar graph P, aiming to regain possible natural symmetries.
     // But use overlap prevention so that the structure cannot change.
     // (Note that now /all/ edges are aligned, so we have total edge-node overlap prevention.)
@@ -387,7 +387,7 @@ void dialect::doHOLA(Graph &G, const HolaOpts &holaOpts, Logger *logger) {
     core->setCorrespondingConstraints(G);
     P->setCorrespondingConstraints(G);
     // Set extra gap for boundary constraints.
-    G.getSepMatrix().setExtraBdryGap(IEL/2.0);
+    G.getSepMatrix().setExtraBdryGap(IEL*holaOpts.extraBoundaryGap);
 
     // Final connector routing.
     G.clearAllRoutes();
@@ -407,8 +407,8 @@ void dialect::doHOLA(Graph &G, const HolaOpts &holaOpts, Logger *logger) {
     RoutingAdapter ra(Avoid::OrthogonalRouting);
     ra.router.setRoutingOption(Avoid::nudgeOrthogonalSegmentsConnectedToShapes, true);
     ra.router.setRoutingOption(Avoid::nudgeSharedPathsWithCommonEndPoint, true);
-    ra.router.setRoutingParameter(Avoid::crossingPenalty, 2*IEL);
-    ra.router.setRoutingParameter(Avoid::segmentPenalty, IEL/2.0);
+    ra.router.setRoutingParameter(Avoid::crossingPenalty, IEL*holaOpts.routingScalar_crossingPenalty);
+    ra.router.setRoutingParameter(Avoid::segmentPenalty, IEL*holaOpts.routingScalar_segmentPenalty);
     ra.router.setRoutingParameter(Avoid::idealNudgingDistance, holaOpts.routingAbs_nudgingDistance);
     // Ask the core graph to add its nodes, and just those edges that do not have any bend nodes.
     // After asking G to clear all routes (remember G has the same Edges as core), these will be all and only

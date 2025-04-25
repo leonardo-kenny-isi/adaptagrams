@@ -195,17 +195,24 @@ public:
         swap(first.m_projectionDebugLevel, second.m_projectionDebugLevel);
         swap(first.m_sepMatrix, second.m_sepMatrix);
         swap(first.m_iel, second.m_iel);
+        swap(first.m_infer_iel_mult, second.m_infer_iel_mult);
         swap(first.m_cgr, second.m_cgr);
         swap(first.m_needNewRectangles, second.m_needNewRectangles);
         swap(first.m_cfdl, second.m_cfdl);
         swap(first.m_nodes, second.m_nodes);
         swap(first.m_edges, second.m_edges);
         swap(first.m_maxDeg, second.m_maxDeg);
+        swap(first.m_edge_thickness, second.m_edge_thickness);
+        swap(first.m_cross_thickness, second.m_cross_thickness);
+        swap(first.m_partition_size, second.m_partition_size);
     }
 
     //! @brief  Copy-assignment operator.
     //! @note  Pass-by-value is deliberate. See https://stackoverflow.com/a/3279550
     Graph &operator=(const Graph other);
+
+    //! @brief  Copy parameters from other graph.
+    void getParameters(Graph &G);
 
     //! @brief  Reports the maximum degree of any Node in this Graph.
     //!
@@ -610,6 +617,24 @@ public:
     //! @brief  Get the edge thickness.
     double getEdgeThickness(void) { return m_edge_thickness; }
 
+    //! @brief  Set the multiplier of the IEL inference.
+    void setMultInferIEL(double t) { m_infer_iel_mult = t; }
+
+    //! @brief  Get the multiplier of the IEL inference.
+    double getMultInferIEL(void) { return m_infer_iel_mult; }
+
+    //! @brief  Set the cross thickness.
+    void setCrossThickness(double t) { m_cross_thickness = t; }
+
+    //! @brief  Get the cross thickness.
+    double getCrossThickness(void) { return m_cross_thickness; }
+
+    //! @brief  Set the partition size.
+    void setPartitionSize(double t) { m_partition_size = t; }
+
+    //! @brief  Get the partition size.
+    double getPartitionSize(void) { return m_partition_size; }
+
     //! @brief  Add padding to all ndoes.
     void padAllNodes(double dw, double dh);
 
@@ -687,9 +712,20 @@ private:
     //! Ideal edge length
     double m_iel = 0;
 
+    //! Multiplier of the IEL inference
+    double m_infer_iel_mult = 2;
+
     //! For some operations we represent aligned edges by (narrow) dummy nodes.
     //! Here we can set the thickness of those nodes.
     double m_edge_thickness = 10;
+
+    //! For some operations we represent crosses by dummy nodes.
+    //! Here we can set the thickness of those nodes as a percentage of IEL.
+    double m_cross_thickness = 0.125;
+
+    //! For some operations we represent the space as partitions for the event checking.
+    //! Here we can set the partition size.
+    double m_partition_size = 0.8;
 
     //! @brief  Automatically pick a good ideal edge length.
     //!
