@@ -111,7 +111,8 @@ LineSegment_SP BoundingBox::buildSideSegment(CardinalDir side) const {
     case CardinalDir::NORTH:
         return std::make_shared<LineSegment>(Point(x, y), Point(X, y));
     default:
-        COLA_ASSERT(false);
+        // COLA_ASSERT(false);
+        throw std::runtime_error("u != nullptr");
 
     }
 }
@@ -470,7 +471,10 @@ void Graph::getChainsAndCycles(std::vector<std::deque<Node_SP> > &chains, std::v
         std::deque<Node_SP> links{L0};
         // Get the two Edges incident to L0, and prepare to explore in both directions.
         const EdgesById &E0 = L0->getEdgeLookup();
-        COLA_ASSERT(E0.size() == 2);
+        // COLA_ASSERT(E0.size() == 2);
+        if(!(E0.size() == 2)){
+            throw std::runtime_error("u != nullptr");
+        }
         int direc = -1;
         bool isPolygon = false;
         for (auto p : E0) {

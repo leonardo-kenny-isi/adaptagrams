@@ -166,14 +166,17 @@ void NodeBuckets::severNodes(const NodesById &nodes) {
 }
 
 Trees dialect::peel(Graph &G) {
+    std::cout << "Peel - Inside" << std::endl;
     // Initialise a fresh Graph, essentially a workspace where we'll build the trees.
     Graph H;
     // The NodeBuckets object keeps the nodes in G sorted by degree.
     NodeBuckets buckets(G);
     // Start by getting the initial leaves.
+    std::cout << "Peel - take leaves" << std::endl;
     NodesById leaves = buckets.takeLeaves();
     while (!leaves.empty()) {
         // Make stems from leaves.
+        std::cout << "Peel - stem" << std::endl;
         vector<Stem_SP> stems = makeStemsFromLeaves(leaves);
         // Cut the leaves out of the graph.
         buckets.severNodes(leaves);
@@ -185,11 +188,13 @@ Trees dialect::peel(Graph &G) {
             COLA_ASSERT(stems.size() == 2);
             stems.pop_back();
         }
+        std::cout << "Peel - selftograph" << std::endl;
         // Add the stems to the new graph.
         for (Stem_SP stem : stems) stem->addSelfToGraph(H);
         // And now see if there are any newly-created leaves.
         leaves = buckets.takeLeaves();
     }
+        std::cout << "Peel - getconncomps" << std::endl;
     // We have now repeatedly cut off all leaves until none remain, reconnecting
     // the removed leaves in the new graph H.
     // The connected components of H are the trees.
@@ -198,6 +203,7 @@ Trees dialect::peel(Graph &G) {
     Trees trees;
     bool G_empty = G.isEmpty();
     for (Graph_SP comp : comps) {
+        std::cout << "Peel - identifyrootnode" << std::endl;
         PeeledNode_SP root = identifyRootNode(*comp);
         // Except in the case of a pure tree with a double centre, in which case the
         // original graph G is now empty, the node that is the root of each tree is
@@ -205,6 +211,7 @@ Trees dialect::peel(Graph &G) {
         // This is the "attachment point". For use later on, we mark that original
         // node as "root" as well (unless G is empty).
         if (!G_empty) {
+            std::cout << "Peel - getrootnode" << std::endl;
             Node_SP originalRoot = G.getNode(root->id());
             originalRoot->setIsRoot(true);
         }

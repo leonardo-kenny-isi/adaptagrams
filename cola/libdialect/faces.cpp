@@ -127,14 +127,20 @@ void FaceSet::computeFaces(void) {
         // (mod number of neighbours) in order to traverse the face in clockwise order.
         size_t n = nbrIds.size(), i0 = n;
         // Check: every node in the face should have at least two neighbours.
-        COLA_ASSERT(n >= 2);
+        // COLA_ASSERT(n >= 2);
+        if(!(n>=2)){
+            throw std::runtime_error("u != nullptr");
+        }
         for (size_t i = 0; i < n; ++i) {
             if (nbrIds[i] == finalEdge.first) {
                 i0 = i;
                 break;
             }
         }
-        COLA_ASSERT(i0 != n);
+        // COLA_ASSERT(i0 != n);
+        if(!(i0 != n)){
+            throw std::runtime_error("u != nullptr");
+        }
         // Since size_t can't be negative, we must add (n-1) rather that subtracting 1,
         // which would fail in the case i0 == 0. Then we can reduce mod n.
         size_t i1 = (i0 + n - 1) % n;
@@ -182,7 +188,10 @@ void FaceSet::identifyExternalFace(void) {
             max_x = p.x;
         }
     }
-    COLA_ASSERT(u != nullptr);
+    // COLA_ASSERT(u != nullptr);
+    if(!(u != nullptr)){
+        throw std::runtime_error("u != nullptr");
+    }
     // The node u cannot have any neighbour to the east. Therefore the node v following
     // u in the clockwise traversal of the exterior face (which, remember, looks anticlockwise,
     // except from the point of view of the point at infinity on the Riemann sphere) must be
@@ -202,7 +211,10 @@ void FaceSet::identifyExternalFace(void) {
         }
     }
     Node_SP v = north_nbr == nullptr ? west_nbr : north_nbr;
-    COLA_ASSERT(v != nullptr);
+    // COLA_ASSERT(v != nullptr);
+    if(!(v != nullptr)){
+        throw std::runtime_error("u != nullptr");
+    }
     // The external face is then the unique one containing the "signature" of u's ID followed
     // by v's ID, in the clockwise traversal of its Nodes (considered cyclically).
     vector<id_type> signature{u->id(), v->id()};
@@ -437,7 +449,8 @@ size_t Face::findIndexOfFirstBend(void) {
     }
     // If we reach this point, we didn't find a bend. This should never happen, since every
     // Face should have at least one bend.
-    COLA_ASSERT(false);
+    // COLA_ASSERT(false);
+    throw std::runtime_error("u != nullptr");
 }
 
 Sides Face::getRelevantSidesForPlacement(TreePlacement_SP tp) const {
@@ -485,7 +498,10 @@ ProjSeq_SP Face::computeCollateralProjSeq(TreePlacement_SP tp, double padding) {
     Sides sides = getRelevantSidesForPlacement(tp);
     // Sanity check: should be exactly one or two relevant Sides:
     size_t n = sides.size();
-    COLA_ASSERT(n == 1 || n == 2);
+    // COLA_ASSERT(n == 1 || n == 2);
+    if(!(n==1 || n==2)){
+        throw std::runtime_error("u != nullptr");
+    }
     // Now simply extend the ProjSeq for each Side, and return the result.
     for (Side_SP S : sides) *ps += *(S->computeCollateralProjSeq(tp, padding));
     return ps;

@@ -30,7 +30,7 @@ autoreconf --install --verbose
 # Instead, use this line for development and for debugging the tests:
 #./configure --disable-shared CXXFLAGS="-g -O0"
 
-make
+bear make -j$(nproc)
 
 # The following builds examples and tests for each of the libraries.
 # Please look at these before sending me questions.
