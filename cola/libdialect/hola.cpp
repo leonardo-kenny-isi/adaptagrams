@@ -61,7 +61,6 @@ void dialect::doHOLA(Graph &G, const HolaOpts &holaOpts, Logger *logger) {
     // If there's no edges, there's nothing to do.
     if (G.getNumEdges() == 0) return;
 
-    std::cout << "Starting" << std::endl;
     // Prepare logging functions in case a logger is given.
     std::function<void(Graph&, string)> log = [logger](Graph &H, string name)->void{
         if (logger!=nullptr) logger->log(H, name);
@@ -72,7 +71,6 @@ void dialect::doHOLA(Graph &G, const HolaOpts &holaOpts, Logger *logger) {
     // Initialise a logging index.
     unsigned ln = 0;
 
-    std::cout << "Get IEL" << std::endl;
     // We let the given graph auto-infer its own ideal edge length, based on node sizes.
     double IEL = G.getIEL();
     // Pad nodes
@@ -85,7 +83,6 @@ void dialect::doHOLA(Graph &G, const HolaOpts &holaOpts, Logger *logger) {
     // Clear any existing connector routes, for better logging output.
     Gcopy->clearAllRoutes();
 
-    std::cout << "Peel" << std::endl;
     // Peel.
     Trees trees = peel(*Gcopy);
     // After peeling, the input graph is peeled down to its own core.
@@ -94,7 +91,6 @@ void dialect::doHOLA(Graph &G, const HolaOpts &holaOpts, Logger *logger) {
 
     log(*core, string_format("%02d_core", ln++));
 
-    std::cout << "Single Tree" << std::endl;
     // If it's just a tree, layout and quit.
     // We recognise this case by there being exactly one tree, containing the same number of
     // nodes as the original graph.
@@ -128,7 +124,6 @@ void dialect::doHOLA(Graph &G, const HolaOpts &holaOpts, Logger *logger) {
 
     // Start with a plain destress -- no constraints, no overlap prevention -- in order to begin
     // giving the nodes a reasonable distribution in the plane.
-    std::cout << "destress" << std::endl;
     core->destress();
 
     log(*core, string_format("%02d_free_destress_core", ln++));
@@ -163,7 +158,6 @@ void dialect::doHOLA(Graph &G, const HolaOpts &holaOpts, Logger *logger) {
 
     log(*core, string_format("%02d_EOP_destress_core", ln++));
 
-    std::cout << "ACA" << std::endl;
     // Next we lay out the links.
     // We may or may not build Chains for this process. Later we will need to know whether chains
     // were built, so the vector of Chains is declared at this scope.
@@ -222,7 +216,6 @@ void dialect::doHOLA(Graph &G, const HolaOpts &holaOpts, Logger *logger) {
 
     log(*core, string_format("%02d_core_leafless_ortho_route", ln++));
 
-    std::cout << "Planarization" << std::endl;
     OrthoPlanariser op(core);
     Graph_SP P = op.planarise();
 
@@ -236,12 +229,10 @@ void dialect::doHOLA(Graph &G, const HolaOpts &holaOpts, Logger *logger) {
     colaOpts.preventOverlaps = true;
     colaOpts.solidifyAlignedEdges = true;
     nli(ln);
-    std::cout << "Destress" << std::endl;
     P->destress(colaOpts);
 
     log(*P, string_format("%02d_P_EOP_destress", ln++));
 
-    std::cout << "Reattach trees" << std::endl;
     // Now we want to reattach the trees, choosing faces of the planarised core in which to
     // place them.
     // First the trees need their own symmetric layout.
@@ -261,11 +252,9 @@ void dialect::doHOLA(Graph &G, const HolaOpts &holaOpts, Logger *logger) {
     // Now we can choose faces and reattach them.
     FaceSet_SP faceSet = reattachTrees(P, trees, holaOpts, logger);
     ++ln;
-    std::cout << "get tree placements" << std::endl;
     // We will need the vector of chosen tree placements.
     TreePlacements tps = faceSet->getAllTreePlacements();
 
-    std::cout << "Insert trees in planar graph" << std::endl;
     // Next we insert the actual trees back into the planar graph.
     // The trees come with buffer nodes. We build a record of those, so they can be
     // ignored where necessary.
@@ -285,7 +274,6 @@ void dialect::doHOLA(Graph &G, const HolaOpts &holaOpts, Logger *logger) {
 
     log(*P, string_format("%02d_P_with_trees", ln++));
 
-    std::cout << "destress" << std::endl;
     // We don't need solid edges within the trees; moreover, this would cause constraint
     // conflicts since the tree nodes now belong to clusters to which their solid edges
     // would not belong.
@@ -302,7 +290,6 @@ void dialect::doHOLA(Graph &G, const HolaOpts &holaOpts, Logger *logger) {
 
     log(*P, string_format("%02d_P_nbr_destress", ln++));
 
-    std::cout << "Near Align" << std::endl;
     // Do near alignments.
     if (holaOpts.do_near_align) {
         AlignmentTable atab(*P, bufferNodes);
@@ -404,7 +391,6 @@ void dialect::doHOLA(Graph &G, const HolaOpts &holaOpts, Logger *logger) {
 
     // Final connector routing.
     G.clearAllRoutes();
-    std::cout << "Final Connector routing" << std::endl;
 
     if (chains.size() > 0) {
         // If we used Chains, then there may be AestheticBends that were set as route points for certain
